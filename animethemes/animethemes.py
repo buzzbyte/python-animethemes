@@ -36,6 +36,7 @@ class AnimeThemes(object):
     
     def _request(self, *endpoint, **kwargs):
         """ Requests an API endpoint """
+        endpoint = (str(x) for x in endpoint) # make sure it doesn't complain about ints
         request_url = urljoin(self.api_url, *endpoint)
         res = requests.request(
             method="GET",
@@ -57,7 +58,8 @@ class AnimeThemes(object):
     def _lookup_request(self, *endpoint, include=[], fields={}):
         """ Handles requests for lookup results with `include` and `fields` """
         payload = self._dict_payload(fields)
-        payload['include'] = ','.join(include)
+        if include is not None:
+            payload['include'] = ','.join(include)
         return self._request_json(*endpoint, params=payload)
 
     def _dict_payload(self, indict):
@@ -83,6 +85,17 @@ class AnimeThemes(object):
             'fields': ','.join(fields)
         })
         return SearchResult(self, result)
+    
+    def announcement(self, id, fields={}):
+        """ Returns announcement information
+
+        Args:
+            id (int): The announcement id
+            fields (dict): A dictionary of lists of fields by resource type
+        """
+        result = self._lookup_request("announcement", id,
+            include=None, fields=fields)
+        return Announcement(self, result)
     
     def anime(self, slug, include=[], fields={}):
         """ Returns anime information

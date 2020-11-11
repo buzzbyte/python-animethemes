@@ -34,12 +34,19 @@ class AnimeThemesObject(object):
         self._set_list_attrib('artists', Artist)
         self._set_list_attrib('synonyms', Synonym)
         self._set_list_attrib('resources', Resource)
+        self._set_list_attrib('announcements', Announcement)
     
     def _set_list_attrib(self, key, atcls):
         """ Sets and objectifies lists in data as attributes if they're not None """
         data_val = self._data.get(key)
         if data_val is not None and isinstance(data_val, list):
             setattr(self, key, [atcls(self.client, x) for x in data_val])
+
+class Announcement(AnimeThemesObject):
+    """ Announcement Resource """
+    
+    def __init__(self, client, data: dict):
+        super().__init__(client, data, ['id', 'content'])
 
 class Anime(AnimeThemesObject):
     """ Anime Resource """
