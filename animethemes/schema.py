@@ -76,7 +76,7 @@ class Resource(AnimeThemesObject):
     
     def __init__(self, client, data: dict):
         super().__init__(client, data,
-            ['id', 'external_id', 'link', 'type', 'as'])
+            ['id', 'external_id', 'link', 'site', 'as'])
 
 class Series(AnimeThemesObject):
     """ Series Resource """
