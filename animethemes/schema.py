@@ -46,13 +46,13 @@ class Anime(AnimeThemesObject):
     
     def __init__(self, client, data: dict):
         super().__init__(client, data, [
-            'id', 'name', 'alias', 'year', 'season', 'synopsis', 'cover'])
+            'id', 'name', 'slug', 'year', 'season', 'synopsis', 'cover'])
 
 class Artist(AnimeThemesObject):
     """ Artist Resource """
     
     def __init__(self, client, data: dict):
-        super().__init__(client, data, ['id', 'name', 'alias'])
+        super().__init__(client, data, ['id', 'name', 'slug'])
 
         self.members   = data.get('members', []) # undocumented?
         self.groups    = data.get('groups' , []) # undocumented?
@@ -75,7 +75,7 @@ class Series(AnimeThemesObject):
     """ Series Resource """
     
     def __init__(self, client, data: dict):
-        super().__init__(client, data, ['id', 'name', 'alias'])
+        super().__init__(client, data, ['id', 'name', 'slug'])
 
 class Song(AnimeThemesObject):
     """ Song Resource """

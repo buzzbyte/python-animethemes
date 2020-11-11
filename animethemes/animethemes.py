@@ -84,37 +84,37 @@ class AnimeThemes(object):
         })
         return SearchResult(self, result)
     
-    def anime(self, alias, include=[], fields={}):
-        """ Returns anime from unique alias
+    def anime(self, slug, include=[], fields={}):
+        """ Returns anime information
         
         Args:
-            alias (str): The anime's unique alias
+            slug (str): The anime's slug
             include (list): A list of included related resources:
                 synonyms, series, themes, themes.entries,
                 themes.entries.videos, themes.song, themes.song.artists,
                 externalResources
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("anime", alias,
+        result = self._lookup_request("anime", slug,
             include=include, fields=fields)
         return Anime(self, result)
     
-    def artist(self, alias, include=[], fields={}):
-        """ Returns artist info from unique alias
+    def artist(self, slug, include=[], fields={}):
+        """ Returns artist information
         
         Args:
-            alias (str): The artist's unique alias
+            slug (str): The artist's slug
             include (list): A list of included related resources:
                 songs, songs.themes, songs.themes.anime, members, groups,
                 externalResources
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("artist", alias,
+        result = self._lookup_request("artist", slug,
             include=include, fields=fields)
         return Artist(self, result)
     
     def entry(self, id, include=[], fields={}):
-        """ Returns entry from unique id
+        """ Returns entry from id
         
         Args:
             id (int): The entry id
@@ -127,7 +127,7 @@ class AnimeThemes(object):
         return Entry(self, result)
     
     def resource(self, id, include=[], fields={}):
-        """ Returns resource from unique id
+        """ Returns resource from id
         
         Args:
             id (int): The resource id
@@ -139,23 +139,23 @@ class AnimeThemes(object):
             include=include, fields=fields)
         return Resource(self, result)
     
-    def series(self, alias, include=[], fields={}):
-        """ Returns series info from unique alias
+    def series(self, slug, include=[], fields={}):
+        """ Returns series information
         
         Args:
-            alias (str): The series unique alias
+            slug (str): The series slug
             include (list): A list of included related resources:
                 anime.synonyms, anime.themes, anime.themes.entries,
                 anime.themes.entries.videos, anime.themes.song,
                 anime.themes.song.artists, anime.externalResources
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("series", alias,
+        result = self._lookup_request("series", slug,
             include=include, fields=fields)
         return Series(self, result)
     
     def song(self, id, include=[], fields={}):
-        """ Returns song from unique id
+        """ Returns song from id
         
         Args:
             id (int): The song id
@@ -168,7 +168,7 @@ class AnimeThemes(object):
         return Song(self, result)
     
     def synonym(self, id, include=[], fields={}):
-        """ Returns synonym from unique id
+        """ Returns synonym from id
         
         Args:
             id (int): The synonym id
@@ -180,7 +180,7 @@ class AnimeThemes(object):
         return Synonym(self, result)
     
     def theme(self, id, include=[], fields={}):
-        """ Returns theme from unique id
+        """ Returns theme from id
         
         Args:
             id (int): The theme id
