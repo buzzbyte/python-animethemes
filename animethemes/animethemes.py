@@ -53,22 +53,29 @@ class AnimeThemes(object):
             res = self._request(*endpoint, **kwargs)
             return res.json()
         except json.JSONDecodeError as val_err:
-            raise InvalidResponse("Invalid JSON recieved", val_err) from val_err
+            raise InvalidResponse("Invalid JSON received", val_err) from val_err
     
-    def _lookup_request(self, *endpoint, include=[], fields={}):
-        """ Handles requests for lookup results with `include` and `fields` """
-        payload = self._dict_payload(fields)
-        if include is not None:
-            payload['include'] = ','.join(include)
-        return self._request_json(*endpoint, params=payload)
+    def _api_request(self, *endpoint, **kwargs):
+        """ Parses query params and sends a request to the API """
+        params = {}
+        for k, v in kwargs.items():
+            if not v:
+                continue
+            if isinstance(v, dict):
+                params.update(self._nested_params(k, v))
+            elif isinstance(v, list):
+                params[k] = ','.join(v)
+            else:
+                params[k] = v
+        return self._request_json(*endpoint, params=params)
 
-    def _dict_payload(self, indict):
-        """ Transforms a dictionary into readable params accepted by the API """
-        payload = {}
-        for k, v in indict.items():
-            key = "fields[{}]".format(k)
-            payload[key] = ','.join(v)
-        return payload
+    def _nested_params(self, name, nested):
+        """ Transforms a dictionary into nested params accepted by the API """
+        params = {}
+        for k, v in nested.items():
+            key = "{}[{}]".format(name, k)
+            params[key] = ','.join(v) if isinstance(v, list) else v
+        return params
     
     def search(self, query, limit=5, fields=[]):
         """ Returns relevant resources by search criteria
@@ -79,11 +86,11 @@ class AnimeThemes(object):
             fields (list): A list of resources to include: anime, artists,
                 entries, series, songs, synonyms, themes, videos
         """
-        result = self._request_json('search', params={
-            'q': query,
-            'limit': limit,
-            'fields': ','.join(fields)
-        })
+        result = self._api_request('search',
+            q=query,
+            limit=limit,
+            fields=fields
+        )
         return SearchResult(self, result)
     
     def announcement(self, id, fields={}):
@@ -93,8 +100,7 @@ class AnimeThemes(object):
             id (int): The announcement id
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("announcement", id,
-            include=None, fields=fields)
+        result = self._api_request("announcement", id, fields=fields)
         return Announcement(self, result)
     
     def anime(self, slug, include=[], fields={}):
@@ -108,7 +114,7 @@ class AnimeThemes(object):
                 externalResources
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("anime", slug,
+        result = self._api_request("anime", slug,
             include=include, fields=fields)
         return Anime(self, result)
     
@@ -122,7 +128,7 @@ class AnimeThemes(object):
                 externalResources
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("artist", slug,
+        result = self._api_request("artist", slug,
             include=include, fields=fields)
         return Artist(self, result)
     
@@ -135,7 +141,7 @@ class AnimeThemes(object):
                 anime, themes, videos
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("entry", id,
+        result = self._api_request("entry", id,
             include=include, fields=fields)
         return Entry(self, result)
     
@@ -148,7 +154,7 @@ class AnimeThemes(object):
                 anime, artists
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("resource", id,
+        result = self._api_request("resource", id,
             include=include, fields=fields)
         return Resource(self, result)
     
@@ -163,7 +169,7 @@ class AnimeThemes(object):
                 anime.themes.song.artists, anime.externalResources
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("series", slug,
+        result = self._api_request("series", slug,
             include=include, fields=fields)
         return Series(self, result)
     
@@ -176,7 +182,7 @@ class AnimeThemes(object):
                 themes, themes.anime, artists
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("song", id,
+        result = self._api_request("song", id,
             include=include, fields=fields)
         return Song(self, result)
     
@@ -188,7 +194,7 @@ class AnimeThemes(object):
             include (list): A list of included related resources: anime
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("synonym", id,
+        result = self._api_request("synonym", id,
             include=include, fields=fields)
         return Synonym(self, result)
     
@@ -201,7 +207,7 @@ class AnimeThemes(object):
                 anime, entries, entries.videos, song, song.artists
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("theme", id,
+        result = self._api_request("theme", id,
             include=include, fields=fields)
         return Theme(self, result)
     
@@ -214,6 +220,6 @@ class AnimeThemes(object):
                 entries, entries.theme, entries.theme.anime
             fields (dict): A dictionary of lists of fields by resource type
         """
-        result = self._lookup_request("video", basename,
+        result = self._api_request("video", basename,
             include=include, fields=fields)
         return Video(self, result)

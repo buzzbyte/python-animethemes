@@ -20,10 +20,10 @@ class AnimeThemesObject(object):
             self.anime = Anime(client, data.get('anime', {}))
         
         if isinstance(self._data.get('theme'), dict):
-            self.anime = Theme(client, data.get('theme', {}))
+            self.theme = Theme(client, data.get('theme', {}))
         
         if isinstance(self._data.get('song'), dict):
-            self.anime = Song(client, data.get('song', {}))
+            self.song = Song(client, data.get('song', {}))
         
         self._set_list_attrib('songs', Song)
         self._set_list_attrib('anime', Anime)
@@ -41,6 +41,17 @@ class AnimeThemesObject(object):
         data_val = self._data.get(key)
         if data_val is not None and isinstance(data_val, list):
             setattr(self, key, [atcls(self.client, x) for x in data_val])
+    
+    def get(self):
+        """ Requests full information on an object if available, otherwise
+            return self 
+        """
+        url = self._data.get('links', {}).get('show')
+        if not url:
+            return self
+        data = requests.get(url, headers=self.client.headers)
+        data.raise_for_status()
+        return type(self)(self.client, data.json())
 
 class Announcement(AnimeThemesObject):
     """ Announcement Resource """
