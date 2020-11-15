@@ -4,8 +4,6 @@ import logging
 import json
 import requests
 
-from animethemes import __version__
-
 API_URL = "https://animethemes.dev/api"
 
 class AnimeThemesError(Exception):
