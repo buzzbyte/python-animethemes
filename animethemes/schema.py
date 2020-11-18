@@ -1,5 +1,10 @@
 from dateutil.parser import parse as parsedatetime
 import requests
+import re
+
+AL_ID_PATTERN  = re.compile(r'https:\/\/anilist\.co\/anime\/([\d]+)')
+MAL_ID_PATTERN = re.compile(r'https:\/\/myanimelist\.net\/anime\/([\d]+)')
+ADB_ID_PATTERN = re.compile(r'(?:https:\/\/anidb\.net\/perl-bin\/animedb\.pl\?show=anime\&aid=|https:\/\/anidb\.net\/anime\/)([\d]+)')
 
 class AnimeThemesObject(object):
     """ Represents an AnimeThemes object """
@@ -65,6 +70,28 @@ class Anime(AnimeThemesObject):
     def __init__(self, client, data: dict):
         super().__init__(client, data, [
             'id', 'name', 'slug', 'year', 'season', 'synopsis', 'cover'])
+    
+    def _site_id(self, site):
+        """ Returns resource site's ID of the anime based on `site` or `None`
+            if not found
+        """
+        for resource in self.resources:
+            if resource.site.lower() == site.lower():
+                _, site_id = resource.site_id()
+                return site_id
+        return None
+    
+    def mal_id(self):
+        """ Returns the MyAnimeList ID for this anime or `None` if not found """
+        return self._site_id('myanimelist')
+    
+    def anilist_id(self):
+        """ Returns the AniList ID for this anime or `None` if not found """
+        return self._site_id('anilist')
+    
+    def anidb_id(self):
+        """ Returns the aniDB ID for this anime or `None` if not found """
+        return self._site_id('anidb')
 
 class Artist(AnimeThemesObject):
     """ Artist Resource """
@@ -88,6 +115,24 @@ class Resource(AnimeThemesObject):
     def __init__(self, client, data: dict):
         super().__init__(client, data,
             ['id', 'external_id', 'link', 'site', 'as'])
+    
+    def site_id(self):
+        """ Parses ID from the resource link and returns either a tuple of
+            `site` and the parsed ID, or `None` if not applicable
+
+            This only checks for anime URLs at the moment.
+        """
+        sites = ['mal', 'myanimelist', 'anilist', 'anidb']
+        if not self.link or self.site.lower() not in sites:
+            # might be redundant, but it lowers the overhead of the matching if
+            # we already know what we can check for
+            return None
+        for pattern in (AL_ID_PATTERN, MAL_ID_PATTERN, ADB_ID_PATTERN):
+            match = pattern.match(self.link)
+            if not match or len(match.groups()) < 1:
+                continue
+            return (self.site, match.group(1))
+        return None
 
 class Series(AnimeThemesObject):
     """ Series Resource """
