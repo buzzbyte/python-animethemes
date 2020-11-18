@@ -276,7 +276,7 @@ class AnimeThemes(object):
         Args:
             include (list, optional): A list of included related resources:
                 anime, artists
-            type (str, optional): Filter resources by type:
+            site (str, optional): Filter resources by site:
                 official_site, twitter, anidb, anilist, anime_planet, ann, 
                 kitsu, mal, wiki
             page (int, optional): The page number of resources to return
@@ -289,7 +289,10 @@ class AnimeThemes(object):
         Returns:
             PagedResult: A PagedResult containing Resource objects
         """
-        result = self._paged_request("resource", **kwargs)
+        fparam = {
+            'site': kwargs.get('site')
+        }
+        result = self._paged_request("resource", filter=fparam, **kwargs)
         return PagedResult(self, result)
     
     def resource(self, id, include=[], fields={}):
