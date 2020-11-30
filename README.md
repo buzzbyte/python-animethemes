@@ -2,7 +2,7 @@
 A Python wrapper for AnimeThemes.moe API (incomplete).
 Still a work-in-progress at the moment and subject to change.
 
-Currently uses API endpoints at `https://animethemes.dev/api`
+Currently uses API endpoints at `https://staging.animethemes.moe/api`
 
 ## Usage
 ```python

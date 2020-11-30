@@ -4,7 +4,7 @@ import logging
 import json
 import requests
 
-API_URL = "https://animethemes.dev/api"
+API_URL = "https://staging.animethemes.moe/api"
 
 class AnimeThemesError(Exception):
     """ Exception handler for AnimeThemes API Wrapper """
@@ -24,7 +24,7 @@ class AnimeThemes(object):
 
         Args:
             api_url (str, optional): URL of the API location. Defaults to
-                "https://animethemes.dev/api".
+                "https://staging.animethemes.moe/api".
         """
         self.logger = logging.getLogger(__name__)
         self.api_url = api_url
